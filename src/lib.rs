@@ -171,8 +171,6 @@ pub struct CentralLinkOfTrustContract {
     // hashedUserId -> total deposit locked for storage
     user_deposits: IterableMap<HashedUserId, NearToken>,
 
-    // A global default trust request cost
-    global_default_fee: NearToken,
 
     // Maximum expiry offset in nanoseconds
     timeout_duration: u64,
@@ -183,7 +181,6 @@ impl Default for CentralLinkOfTrustContract {
         Self {
             users: IterableMap::new(b"u".to_vec()),
             user_deposits: IterableMap::new(b"d".to_vec()),
-            global_default_fee: NearToken::from_yoctonear(10_000_000_000_000_000_000_000), // 0.01 NEAR
             timeout_duration: 7 * 24 * 60 * 60 * 1_000_000_000,                            // 7 days
         }
     }
@@ -278,18 +275,7 @@ impl CentralLinkOfTrustContract {
     // ----------------
     // BASICS
     // ----------------
-    #[private]
-    pub fn set_global_default_fee(&mut self, fee: NearToken) {
-        require!(
-            env::predecessor_account_id() == env::current_account_id(),
-            "ERR_NOT_ALLOWED"
-        );
-        self.global_default_fee = fee;
-    }
 
-    pub fn get_global_default_fee(&self) -> NearToken {
-        self.global_default_fee.clone()
-    }
     pub fn get_total_users_deposit(&self) -> NearToken {
         NearToken::from_yoctonear(
             self.user_deposits

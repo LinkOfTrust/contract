@@ -2,6 +2,20 @@
 
 This NEAR smart contract implements a simple "trust network" model. Users register on-chain, set trust relationships, and block or unblock other users.
 
+## Safe Deposit
+
+To allow decentralisation, users storing data in the contract (trusting/blocking users, public profile, account creation) need to provide a deposit.
+This deposit belong to the account and can be redemeed at any time.
+
+When the data shrink, the deposit amount is automatically refunded to the user. On accoutn deletion the total deposit amount is refunded.
+
+### Profit extraction
+
+A mechanism is implemented for the contract owner to extract profits without stealing deposit of the users.
+At any time you can verify that the sum of the amount of NEAR deposited by the users is inferior to the smartcontract amount balance using `get_total_users_deposit()`.
+The contract owner can execute `extract_profit(to: AccountId, amount: NearToken)` to extract some near token from the contract. This call will fail if it would result in a balance inferior to the total deposited amount, preventing rug pull.
+
+
 ## Overview
 
 - **Hashed User IDs**  
