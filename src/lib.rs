@@ -171,7 +171,6 @@ pub struct CentralLinkOfTrustContract {
     // hashedUserId -> total deposit locked for storage
     user_deposits: IterableMap<HashedUserId, NearToken>,
 
-
     // Maximum expiry offset in nanoseconds
     timeout_duration: u64,
 }
@@ -181,7 +180,7 @@ impl Default for CentralLinkOfTrustContract {
         Self {
             users: IterableMap::new(b"u".to_vec()),
             user_deposits: IterableMap::new(b"d".to_vec()),
-            timeout_duration: 7 * 24 * 60 * 60 * 1_000_000_000,                            // 7 days
+            timeout_duration: 7 * 24 * 60 * 60 * 1_000_000_000, // 7 days
         }
     }
 }
@@ -291,7 +290,9 @@ impl CentralLinkOfTrustContract {
         );
 
         let profit_to_extract = NearToken::from_yoctonear(
-            env::account_balance().as_yoctonear() - self.get_total_users_deposit().as_yoctonear(),
+            env::account_balance().as_yoctonear()
+                - self.get_total_users_deposit().as_yoctonear()
+                - (2 * 10 ^ 24), //Overhead for contract size
         );
 
         require!(profit_to_extract >= amount, "ERR_NOT_ENOUGH_BALANCE");
@@ -499,10 +500,10 @@ mod tests {
     }
 
     /// If a user is blocked, the other user cannot remain in trust_network.
-    /// 
-    /// Simulate the logic that "If user2 is blocked by user1, user2's 
-    /// trust relationship to user1 is removed." 
-    /// This is partially tested in `block_user` contract call, 
+    ///
+    /// Simulate the logic that "If user2 is blocked by user1, user2's
+    /// trust relationship to user1 is removed."
+    /// This is partially tested in `block_user` contract call,
     /// but here we do it on the data structure level.
     #[test]
     fn blocking_remove_other_trust() {
