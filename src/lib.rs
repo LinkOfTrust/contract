@@ -337,6 +337,16 @@ impl CentralLinkOfTrustContract {
         }
     }
 
+    /// Return a `UserDataView` for the given hashed ID.
+    pub fn get_user_deposit(&self, user_id: String) -> Option<NearToken> {
+        let h_user_id = HashedUserId::from_bs58(&user_id);
+        if let Some(deposit) = self.user_deposits.get(&h_user_id) {
+            Some(deposit.to_owned())
+        } else {
+            None
+        }
+    }
+
     // trust level = 0..1
     #[payable]
     pub fn trust(&mut self, user_id: String, level: f32) {
